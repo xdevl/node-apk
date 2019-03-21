@@ -1,0 +1,38 @@
+{
+  "name": "node-apk",
+  "version": "1.0.0-beta.0",
+  "description": "A library to parse Android application manifest and signature",
+  "main": "dist/index.js",
+  "types": "types/index.d.ts",
+  "scripts": {
+    "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
+    "build": "tsc",
+    "prestart": "npm run build",
+    "start": "node .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xdevl/node-apk.git"
+  },
+  "keywords": [
+    "android",
+    "apk",
+    "parser",
+    "manifest",
+    "signature"
+  ],
+  "author": "xdevl",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^11.11.4",
+    "@types/node-forge": "^0.8.0",
+    "@types/yauzl-promise": "^2.1.0",
+    "tslint": "^5.14.0",
+    "typescript": "^3.3.4000"
+  },
+  "dependencies": {
+    "node-forge": "^0.8.2",
+    "yauzl-promise": "^2.1.3"
+  }
+}
