@@ -10,9 +10,9 @@ export default class Certificate {
 
   public static parse(buffer: Buffer): Certificate[] {
     const asn = NodeForge.asn1.fromDer(NodeForge.util.createBuffer(buffer));
-    const pkcs7 = NodeForge.pkcs7.messageFromAsn1(asn);
-    return (pkcs7.certificates as NodeForge.pki.Certificate[])
-      .map((certificate) => new Certificate(certificate));
+    return ((NodeForge.pkcs7 as any).messageFromAsn1(asn)
+        .certificates as NodeForge.pki.Certificate[])
+        .map((certificate) => new Certificate(certificate));
   }
 
   private static md5sum(certificate: NodeForge.pki.Certificate): string {

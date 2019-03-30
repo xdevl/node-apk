@@ -3,14 +3,6 @@
 This work is licensed under the terms of the MIT license.
 For a copy, see <https://opensource.org/licenses/MIT>.*/
 
-/// <reference types="node-forge" />
-declare module "node-forge" {
-
-  namespace pkcs7 {
-    function messageFromAsn1(asn: asn1.Asn1): any;
-  }
-}
-
 declare module "node-apk" {
 
   interface XmlElement {
