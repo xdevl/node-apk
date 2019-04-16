@@ -3,6 +3,8 @@
 This work is licensed under the terms of the MIT license.
 For a copy, see <https://opensource.org/licenses/MIT>.*/
 
+import {Readable} from "stream";
+
 export default class Source {
 
   public buffer: Buffer;
@@ -29,11 +31,11 @@ export default class Source {
   }
 
   public readUtf8String(size: number): string {
-    return this.buffer.toString("utf8", this.cursor, this.cursor + size);
+    return this.buffer.toString("utf8", this.getCursorAndMove(size), this.cursor);
   }
 
   public readUtf16String(size: number): string {
-    return this.buffer.toString("ucs2", this.cursor, this.cursor + size);
+    return this.buffer.toString("ucs2", this.getCursorAndMove(size), this.cursor);
   }
 
   public source(size: number) {
@@ -47,5 +49,13 @@ export default class Source {
 
   public moveAt(position: number): any {
     this.getCursorAndMove(position - this.cursor);
+  }
+
+  public stream(size: number): Readable {
+    const readable = new Readable();
+    readable._read = () => undefined;
+    readable.push(this.buffer.slice(this.cursor, this.cursor + size));
+    readable.push(null);
+    return readable;
   }
 }

@@ -4,10 +4,10 @@ This work is licensed under the terms of the MIT license.
 For a copy, see <https://opensource.org/licenses/MIT>.*/
 
 import NodeFs from "fs";
-import NodeZip from "jszip";
 import BinaryXml from "./binaryXml";
 import Certificate from "./certificate";
 import Source from "./source";
+import ZipEntry from "./zip";
 
 export default class Apk {
   private path: string;
@@ -17,9 +17,7 @@ export default class Apk {
   }
 
   public lookupEntry(key: string): Promise<NodeJS.ReadableStream> {
-    return this.bufferize(NodeFs.createReadStream(this.path))
-      .then((buffer) => NodeZip.loadAsync(buffer))
-      .then((zip) => zip.files[key].nodeStream());
+    return ZipEntry.lookup(this.path, key).then((entry) => entry.stream());
   }
 
   public getCertificateInfo(): Promise<Certificate[]> {
