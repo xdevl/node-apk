@@ -16,18 +16,19 @@ export default class Apk {
     this.path = path;
   }
 
-  public lookupEntry(key: string): Promise<NodeJS.ReadableStream> {
-    return ZipEntry.lookup(this.path, key).then((entry) => entry.stream());
-  }
-
   public getCertificateInfo(): Promise<Certificate[]> {
-    return this.lookupEntry("META-INF/CERT.RSA")
-      .then((stream) => this.bufferize(stream))
-      .then((buffer) => Certificate.parse(buffer));
+    return ZipEntry.index(this.path).then((map) => {
+      return Promise.all(Array.from(map.values())
+        .filter((entry) => entry.name.startsWith("META-INF/") && entry.name.endsWith(".RSA"))
+        .map((certEntry) => this.bufferize(certEntry.stream())
+            .then((buffer) => Certificate.parse(buffer))),
+      ).then((all) => ([] as Certificate[]).concat.apply([], all));
+    });
   }
 
   public getManifestInfo(): Promise<BinaryXml> {
-    return this.lookupEntry("AndroidManifest.xml")
+    return ZipEntry.lookup(this.path, "AndroidManifest.xml")
+      .then((entry) => entry.stream())
       .then((stream) => this.bufferize(stream))
       .then((buffer) => new BinaryXml(new Source(buffer)));
   }
