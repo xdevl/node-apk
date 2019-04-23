@@ -16,14 +16,25 @@ export default class Apk {
     this.path = path;
   }
 
-  public lookupEntry(key: string): Promise<NodeJS.ReadableStream> {
+  public lookupEntry(key: string | RegExp): Promise<NodeJS.ReadableStream> {
     return this.bufferize(NodeFs.createReadStream(this.path))
       .then((buffer) => NodeZip.loadAsync(buffer))
-      .then((zip) => zip.files[key].nodeStream());
+      .then((zip) => {
+        if (typeof key === 'string') {
+          return zip.files[key].nodeStream();
+        } else {
+          for (const k in zip.files) {
+            if (key.test(k)) {
+              return zip.files[k].nodeStream();
+            }
+          }
+          throw new Error(`lookupEntry [${key}] fail.`);
+        }
+      });
   }
 
   public getCertificateInfo(): Promise<Certificate[]> {
-    return this.lookupEntry("META-INF/CERT.RSA")
+    return this.lookupEntry(/META-INF\/\w+\.RSA/)
       .then((stream) => this.bufferize(stream))
       .then((buffer) => Certificate.parse(buffer));
   }

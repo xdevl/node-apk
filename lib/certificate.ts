@@ -15,10 +15,13 @@ export default class Certificate {
         .map((certificate) => new Certificate(certificate));
   }
 
-  private static md5sum(certificate: NodeForge.pki.Certificate): string {
+  private static getBytes(certificate: NodeForge.pki.Certificate): Buffer {
+    return Buffer.from(NodeForge.pki.pemToDer(NodeForge.pki.certificateToPem(certificate)).getBytes(), 'binary');
+  }
+
+  private static md5sum(buffer: Buffer): string {
     const md5Hash = NodeCrypto.createHash("md5");
-    md5Hash.update(NodeForge.util.binary.raw.decode(NodeForge.pki.pemToDer(
-      NodeForge.pki.certificateToPem(certificate)).getBytes()));
+    md5Hash.update(buffer);
     return md5Hash.digest("hex");
   }
 
@@ -26,6 +29,7 @@ export default class Certificate {
     return (attributes as NodeForge.pki.CertificateField[]).map((attr) => `${attr.shortName}=${attr.value}`).join(", ");
   }
 
+  public readonly bytes: Buffer;
   public readonly fingerprint: string;
   public readonly issuer: string;
   public readonly serial: string;
@@ -34,7 +38,8 @@ export default class Certificate {
   public readonly validUntil: Date;
 
   constructor(certificate: NodeForge.pki.Certificate) {
-    this.fingerprint = Certificate.md5sum(certificate);
+    this.bytes = Certificate.getBytes(certificate);
+    this.fingerprint = Certificate.md5sum(this.bytes);
     this.issuer = Certificate.attributesToString(certificate.issuer.attributes);
     this.serial = certificate.serialNumber;
     this.subject = Certificate.attributesToString(certificate.subject.attributes);
