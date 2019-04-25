@@ -18,12 +18,14 @@ declare module "node-apk" {
   }
 
   interface Certificate {
-      readonly fingerprint: string;
       readonly issuer: string;
       readonly serial: string;
       readonly subject: string;
       readonly validFrom: Date;
       readonly validUntil: Date;
+      readonly md5sum: string;
+      readonly sha1sum: string;
+      readonly sha256sum: string;
   }
 
   class Apk {

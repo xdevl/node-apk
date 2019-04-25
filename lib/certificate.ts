@@ -15,30 +15,29 @@ export default class Certificate {
         .map((certificate) => new Certificate(certificate));
   }
 
-  private static md5sum(certificate: NodeForge.pki.Certificate): string {
-    const md5Hash = NodeCrypto.createHash("md5");
-    md5Hash.update(NodeForge.util.binary.raw.decode(NodeForge.pki.pemToDer(
-      NodeForge.pki.certificateToPem(certificate)).getBytes()));
-    return md5Hash.digest("hex");
-  }
-
   private static attributesToString(attributes: any[]) {
     return (attributes as NodeForge.pki.CertificateField[]).map((attr) => `${attr.shortName}=${attr.value}`).join(", ");
   }
 
-  public readonly fingerprint: string;
   public readonly issuer: string;
   public readonly serial: string;
   public readonly subject: string;
   public readonly validFrom: Date;
   public readonly validUntil: Date;
+  public readonly md5sum: string;
+  public readonly sha1sum: string;
+  public readonly sha256sum: string;
 
   constructor(certificate: NodeForge.pki.Certificate) {
-    this.fingerprint = Certificate.md5sum(certificate);
     this.issuer = Certificate.attributesToString(certificate.issuer.attributes);
     this.serial = certificate.serialNumber;
     this.subject = Certificate.attributesToString(certificate.subject.attributes);
     this.validFrom = certificate.validity.notBefore;
     this.validUntil = certificate.validity.notAfter;
+    const bytes = NodeForge.util.binary.raw.decode(NodeForge.pki.pemToDer(
+      NodeForge.pki.certificateToPem(certificate)).getBytes());
+    this.md5sum = NodeCrypto.createHash("md5").update(bytes).digest("hex");
+    this.sha1sum = NodeCrypto.createHash("sha1").update(bytes).digest("hex");
+    this.sha256sum = NodeCrypto.createHash("sha256").update(bytes).digest("hex");
   }
 }
