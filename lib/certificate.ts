@@ -34,8 +34,8 @@ export default class Certificate {
     this.subject = Certificate.attributesToString(certificate.subject.attributes);
     this.validFrom = certificate.validity.notBefore;
     this.validUntil = certificate.validity.notAfter;
-    const bytes = NodeForge.util.binary.raw.decode(NodeForge.pki.pemToDer(
-      NodeForge.pki.certificateToPem(certificate)).getBytes());
+    const bytes = Buffer.from(NodeForge.util.binary.raw.decode(NodeForge.pki.pemToDer(
+      NodeForge.pki.certificateToPem(certificate)).getBytes()));
     this.md5sum = NodeCrypto.createHash("md5").update(bytes).digest("hex");
     this.sha1sum = NodeCrypto.createHash("sha1").update(bytes).digest("hex");
     this.sha256sum = NodeCrypto.createHash("sha256").update(bytes).digest("hex");

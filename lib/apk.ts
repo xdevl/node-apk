@@ -7,17 +7,22 @@ import NodeFs from "fs";
 import BinaryXml from "./binaryXml";
 import Certificate from "./certificate";
 import Source from "./source";
-import ZipEntry from "./zip";
+import {BufferLoader, ZipEntry} from "./zip";
 
 export default class Apk {
-  private path: string;
 
-  constructor(path: string) {
-    this.path = path;
+  private loader: BufferLoader;
+
+  constructor(input: string|Buffer) {
+    if (typeof input === "string") {
+      this.loader = () => NodeFs.promises.readFile(input);
+    } else {
+      this.loader = () => Promise.resolve(input);
+    }
   }
 
   public getCertificateInfo(): Promise<Certificate[]> {
-    return ZipEntry.index(this.path).then((map) => {
+    return ZipEntry.index(this.loader).then((map) => {
       return Promise.all(Array.from(map.values())
         .filter((entry) => entry.name.startsWith("META-INF/") && entry.name.endsWith(".RSA"))
         .map((certEntry) => this.bufferize(certEntry.stream())
@@ -27,7 +32,7 @@ export default class Apk {
   }
 
   public getManifestInfo(): Promise<BinaryXml> {
-    return ZipEntry.lookup(this.path, "AndroidManifest.xml")
+    return ZipEntry.lookup(this.loader, "AndroidManifest.xml")
       .then((entry) => entry.stream())
       .then((stream) => this.bufferize(stream))
       .then((buffer) => new BinaryXml(new Source(buffer)));

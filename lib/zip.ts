@@ -3,7 +3,6 @@
 This work is licensed under the terms of the MIT license.
 For a copy, see <https://opensource.org/licenses/MIT>.*/
 
-import NodeFs from "fs";
 import NodeZlib from "zlib";
 import Source from "./source";
 
@@ -17,20 +16,22 @@ enum Algorithm {
   NONE = 0,
 }
 
-export default class ZipEntry {
+export type BufferLoader = () => Promise<Buffer>;
 
-  public static lookup(path: string, key: string): Promise<ZipEntry> {
-    return ZipEntry.index(path).then((map) => {
+export class ZipEntry {
+
+  public static lookup(loader: BufferLoader, key: string): Promise<ZipEntry> {
+    return ZipEntry.index(loader).then((map) => {
       const entry = map.get(key);
       if (entry) { return entry; } else { throw Error("Entry not found: " + key); }
     });
   }
 
-  public static index(path: string): Promise<Map<string, ZipEntry>> {
-    return NodeFs.promises.readFile(path).then((buffer) => {
+  public static index(loader: BufferLoader): Promise<Map<string, ZipEntry>> {
+    return loader().then((buffer) => {
       const index = buffer.indexOf("504B0506", 0, "hex");
       if (index < 0) {
-        throw Error(`End of central directory not found in ${path}`);
+        throw Error("End of central directory not found");
       }
       const source = new Source(buffer.slice(index + 10));
       const count = source.readUShort();

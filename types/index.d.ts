@@ -29,7 +29,7 @@ declare module "node-apk" {
   }
 
   class Apk {
-      constructor(path: string);
+      constructor(input: string|Buffer);
       getCertificateInfo(): Promise<Certificate[]>;
       getManifestInfo(): Promise<BinaryXml>;
       close(): Promise<void>;
