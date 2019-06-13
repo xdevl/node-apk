@@ -28,10 +28,16 @@ declare module "node-apk" {
       readonly sha256sum: string;
   }
 
+  interface Resources {
+    resolve(id: number): any[];
+  }
+
   class Apk {
       constructor(input: string|Buffer);
       getCertificateInfo(): Promise<Certificate[]>;
       getManifestInfo(): Promise<BinaryXml>;
+      getResources(): Promise<Resources>;
+      extract(key: string): Promise<Buffer>;
       close(): Promise<void>;
   }
 }

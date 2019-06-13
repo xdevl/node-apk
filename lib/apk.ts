@@ -6,6 +6,7 @@ For a copy, see <https://opensource.org/licenses/MIT>.*/
 import NodeFs from "fs";
 import BinaryXml from "./binaryXml";
 import Certificate from "./certificate";
+import Resources from "./resources";
 import Source from "./source";
 import {BufferLoader, ZipEntry} from "./zip";
 
@@ -32,10 +33,19 @@ export default class Apk {
   }
 
   public getManifestInfo(): Promise<BinaryXml> {
-    return ZipEntry.lookup(this.loader, "AndroidManifest.xml")
-      .then((entry) => entry.stream())
-      .then((stream) => this.bufferize(stream))
+    return this.extract("AndroidManifest.xml")
       .then((buffer) => new BinaryXml(new Source(buffer)));
+  }
+
+  public getResources(): Promise<Resources> {
+    return this.extract("resources.arsc")
+      .then((buffer) => new Resources(new Source(buffer)));
+  }
+
+  public extract(key: string): Promise<Buffer> {
+    return ZipEntry.lookup(this.loader, key)
+      .then((entry) => entry.stream())
+      .then((stream) => this.bufferize(stream));
   }
 
   public close() {
