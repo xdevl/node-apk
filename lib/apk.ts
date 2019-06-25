@@ -1,13 +1,16 @@
-/*Copyright (c) 2019 XdevL. All rights reserved.
-
-This work is licensed under the terms of the MIT license.
-For a copy, see <https://opensource.org/licenses/MIT>.*/
+/*
+ * Copyright (c) 2019 XdevL. All rights reserved.
+ *
+ * This work is licensed under the terms of the MIT license.
+ * For a copy, see <https://opensource.org/licenses/MIT>.
+ */
 
 import NodeFs from "fs";
-import BinaryXml from "./binaryXml";
+import {Manifest, Receiver} from "./android";
 import Certificate from "./certificate";
 import Resources from "./resources";
 import Source from "./source";
+import XmlElement from "./xml";
 import {BufferLoader, ZipEntry} from "./zip";
 
 export default class Apk {
@@ -32,9 +35,9 @@ export default class Apk {
     });
   }
 
-  public getManifestInfo(): Promise<BinaryXml> {
+  public getManifestInfo(): Promise<Manifest> {
     return this.extract("AndroidManifest.xml")
-      .then((buffer) => new BinaryXml(new Source(buffer)));
+      .then((buffer) => new Manifest(new XmlElement(new Source(buffer))));
   }
 
   public getResources(): Promise<Resources> {
