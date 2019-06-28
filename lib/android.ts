@@ -66,7 +66,7 @@ export class Manifest {
   }
 
   get permissions(): Iterable<string> {
-    const permissions = this.xml.children["uses-permission"];
+    const permissions = this.xml.children["uses-permission"] || [];
     return (function*() {
       for (const permission of permissions) {
         yield permission.attributes.name;
@@ -75,7 +75,7 @@ export class Manifest {
   }
 
   get receivers(): Iterable<Receiver> {
-    const receivers = this.xml.children.application[0].children.receiver;
+    const receivers = this.xml.children.application[0].children.receiver || [];
     return (function*() {
       for (const receiver of receivers) {
         yield new Receiver(receiver);
