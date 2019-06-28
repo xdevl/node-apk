@@ -27,14 +27,14 @@ apk.getManifestInfo().then((manifest) => {
 ```
 
 ### Certificate information
-Signature details can be retrieved with:
+Certificates can be retrieved like the following:
 ```javascript
-apk.getCertificateInfo().then((certs) => {
-    console.log(`issuer = ${certs[0].issuer}`);
-    console.log(`subject = ${certs[0].subject}`);
-    console.log(`validUntil = ${certs[0].validUntil}`);
-    console.log(`sha256sum = ${certs[0].sha256sum}`);
-});
+apk.getCertificateInfo().then((certs) => certs.foreach((cert) => {
+    console.log(`issuer = ${cert.issuer.get("CN")}`);
+    console.log(`subject = ${cert.subject.get("CN")}`);
+    console.log(`validUntil = ${cert.validUntil}`);
+    console.log(cert.bytes.toString("base64"));
+}));
 ```
 ### Application resources
 This library supports rudimentary support for application resources as shown below:

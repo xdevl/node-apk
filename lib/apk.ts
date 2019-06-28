@@ -29,9 +29,8 @@ export default class Apk {
     return ZipEntry.index(this.loader).then((map) => {
       return Promise.all(Array.from(map.values())
         .filter((entry) => entry.name.startsWith("META-INF/") && entry.name.endsWith(".RSA"))
-        .map((certEntry) => this.bufferize(certEntry.stream())
-            .then((buffer) => Certificate.parse(buffer))),
-      ).then((all) => ([] as Certificate[]).concat.apply([], all));
+        .map((certEntry) => this.bufferize(certEntry.stream()).then((buffer) => Certificate.parse(buffer))),
+      );
     });
   }
 
