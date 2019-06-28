@@ -8,5 +8,5 @@
 export {default as Apk} from "./apk";
 export {default as Certificate} from "./certificate";
 export {Manifest, Receiver} from "./android";
-export {default as Resources} from "./resources";
+export {Locale, Resource, Resources} from "./resources";
 export {default as XmlElement} from "./xml";

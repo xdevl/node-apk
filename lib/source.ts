@@ -1,7 +1,9 @@
-/*Copyright (c) 2019 XdevL. All rights reserved.
-
-This work is licensed under the terms of the MIT license.
-For a copy, see <https://opensource.org/licenses/MIT>.*/
+/*
+ * Copyright (c) 2019 XdevL. All rights reserved.
+ *
+ * This work is licensed under the terms of the MIT license.
+ * For a copy, see <https://opensource.org/licenses/MIT>.
+ */
 
 import {Readable} from "stream";
 
@@ -47,7 +49,7 @@ export default class Source {
     return this.cursor - offset;
   }
 
-  public moveAt(position: number): any {
+  public moveAt(position: number) {
     this.getCursorAndMove(position - this.cursor);
   }
 

@@ -99,6 +99,10 @@ class TableTypeChunk {
       }
     }
   }
+
+  public resolve(index: number): any {
+    return (this.entries.get(index) || {} as any).value;
+  }
 }
 
 class ResTableConfig {
@@ -121,13 +125,28 @@ class ResTableConfig {
   }
 }
 
-class Locale {
-  public readonly language: string;
-  public readonly country: string;
+export class Locale {
+
+  private static readonly EMPTY_CODE = "\u0000\u0000";
+
+  private readonly languageCode: string;
+  private readonly countryCode: string;
 
   constructor(source: Source) {
-    this.language = source.readUtf8String(2);
-    this.country = source.readUtf8String(2);
+    this.languageCode = source.readUtf8String(2);
+    this.countryCode = source.readUtf8String(2);
+  }
+
+  private convertCode(code: string): string | undefined {
+    return code !== Locale.EMPTY_CODE ? code : undefined;
+  }
+
+  get language(): string | undefined {
+    return this.convertCode(this.languageCode);
+  }
+
+  get country(): string | undefined {
+    return this.convertCode(this.countryCode);
   }
 }
 
@@ -147,7 +166,19 @@ class TableEntry {
   }
 }
 
-export default class Resources {
+export class Resource {
+
+  public readonly value: any;
+  public readonly locale?: Locale;
+  constructor(value: any, locale: Locale) {
+    this.value = value;
+    if (locale.language || locale.country) {
+      this.locale = locale;
+    }
+  }
+}
+
+export class Resources {
 
   public readonly table: Table;
 
@@ -156,7 +187,7 @@ export default class Resources {
     this.table = new Table(chunk);
   }
 
-  public resolve(id: number): any[] {
+  public resolve(id: number): Resource[] {
     const packageId = Math.floor(id / Math.pow(2, 24)) % Math.pow(2, 8);
     const typeId = Math.floor(id / Math.pow(2, 16)) % Math.pow(2, 8);
     const index = id % Math.pow(2, 16);
@@ -165,9 +196,8 @@ export default class Resources {
     if (packageResources) {
       const types = packageResources.types.get(typeId);
       if (types) {
-        return types.reduce( (all, type) =>
-            all.concat(type.entries.get(index) || []), [] as TableEntry[])
-          .map((entry) => entry.value);
+        return types.map((type) => new Resource(type.resolve(index), type.resTableConfig.locale))
+            .filter((resource) => !!resource.value);
       }
     }
     return [];

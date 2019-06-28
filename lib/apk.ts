@@ -8,7 +8,7 @@
 import NodeFs from "fs";
 import {Manifest, Receiver} from "./android";
 import Certificate from "./certificate";
-import Resources from "./resources";
+import {Resources} from "./resources";
 import Source from "./source";
 import XmlElement from "./xml";
 import {BufferLoader, ZipEntry} from "./zip";

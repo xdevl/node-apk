@@ -6,10 +6,10 @@ This library is meant to work with Node JS 4 or later. You can install it using 
 ```shell
 npm install node-apk
 ```
-Please note this library is still in its early stage of development and a fair amount of things are therefore subject to change in the future. If you want to be warned of any future breaking changes we highly recomend the use of typescript for which this library has full typing support.
+The use of typescript is highly recommended for which this library has full typing support.
 
 ## Usage
-Import the Apk class and instanciate it passing your APK's file path
+Import the Apk class and instantiate it passing your APK's file path
 ```javascript
 import {Apk} from "node-apk";
 const apk = new Apk("yourapplication.apk");
@@ -37,22 +37,23 @@ apk.getCertificateInfo().then((certs) => certs.foreach((cert) => {
 }));
 ```
 ### Application resources
-This library supports rudimentary support for application resources as shown below:
+Application resources can be resolved as shown below:
 ```javascript
 const iconBytes = Promise.all<Manifest, Resources>([apk.getManifestInfo(), apk.getResources()])
     .then(([manifest, resources])) => {
-        const label = manifest.applicationLabel;
-        if (typeof label === "string") {
-            console.log(`label = ${label}`);
-        } else {
-            console.log(`label = ${resources.resolve(label)[0]}`);
+        let label = manifest.applicationLabel;
+        if (typeof label !== "string") {
+            const all = resources.resolve(label);
+            label = (all.find((res) => (res.locale && res.locale.language === "fr")) || all[0]).value;
         }
+        console.log(`label = ${label}`);
+
         // resolve and extract the first application icon found
         return apk.extract(resources.resolve(manifest.applicationIcon)[0]);
     }
 ```
 
-### Freeing resources
+### Cleaning up
 Once you are done, don't forget to release you Apk object:
 ```javascript
 apk.close();
