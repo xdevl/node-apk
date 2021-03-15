@@ -10,7 +10,7 @@ import {Readable} from "stream";
 export default class Source {
 
   public buffer: Buffer;
-  public cursor: number = 0;
+  public cursor = 0;
 
   constructor(buffer: Buffer) {
     this.buffer = buffer;

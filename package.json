@@ -1,10 +1,10 @@
 {
   "name": "node-apk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A library to parse Android application manifest and signature",
   "main": "dist/index.js",
   "scripts": {
-    "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
+    "prebuild": "eslint 'lib/**/*.{js,ts,tsx}'",
     "build": "tsc --declaration",
     "prestart": "npm run build",
     "start": "node .",
@@ -24,13 +24,14 @@
   "author": "xdevl",
   "license": "MIT",
   "devDependencies": {
-    "@types/jszip": "^3.1.6",
-    "@types/node": "^11.13.15",
-    "@types/node-forge": "^0.8.4",
-    "tslint": "^5.18.0",
-    "typescript": "^3.5.2"
+    "@types/node": "^14.14.35",
+    "@types/node-forge": "^0.9.7",
+    "@typescript-eslint/eslint-plugin": "^4.18.0",
+    "@typescript-eslint/parser": "^4.18.0",
+    "eslint": "^7.22.0",
+    "typescript": "^4.2.3"
   },
   "dependencies": {
-    "node-forge": "^0.8.4"
+    "node-forge": "^0.10.0"
   }
 }

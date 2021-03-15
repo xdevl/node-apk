@@ -7,7 +7,6 @@ For a copy, see <https://opensource.org/licenses/MIT>.*/
 frameworks/base/libs/androidfw/include/androidfw/ResourceTypes.h
 frameworks/base/libs/androidfw/include/androidfw/ResourceTypes.cpp*/
 
-// tslint:disable max-classes-per-file
 import { Chunk, ChunkType, parseResourceValue, StringPool } from "./common";
 import Source from "./source";
 
@@ -34,7 +33,7 @@ class Table {
 class TablePackageChunk {
 
   private static getOrCreate<K, V>(map: Map<K, V[]>, key: K): V[] {
-    return (map.has(key) ? map : map.set(key, new Array())).get(key)!;
+    return (map.has(key) ? map : map.set(key, [])).get(key)!;
   }
 
   public readonly id: number;

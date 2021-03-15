@@ -3,7 +3,6 @@
 This work is licensed under the terms of the MIT license.
 For a copy, see <https://opensource.org/licenses/MIT>.*/
 
-// tslint:disable max-classes-per-file
 import Source from "./source";
 
 export enum ChunkType {
@@ -79,7 +78,6 @@ export class StringPool {
     // TODO: make sure indexes are sorted
     for (const index of indexes) {
       chunk.chunkSource.moveAt(this.stringsStart - chunk.headerSize + index);
-      // tslint:disable no-bitwise
       if (this.flags & 256) {
         this.values.push(StringPool.readUtf8String(chunk.chunkSource));
       } else {
@@ -103,9 +101,10 @@ export function parseResourceValue(source: Source, stringPool: StringPool): any 
   switch (type) {
     case ResourceType.REFERENCE:
       return source.readInt();
-    case ResourceType.STRING:
+    case ResourceType.STRING: {
       const index = source.readInt();
       return index >= 0 ? stringPool.values[index] : null;
+    }
     case ResourceType.INT_DEC:
       return source.readInt();
     case ResourceType.INT_BOOLEAN:

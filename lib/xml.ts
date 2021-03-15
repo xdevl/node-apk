@@ -5,7 +5,6 @@
  * For a copy, see <https://opensource.org/licenses/MIT>.
  */
 
-// tslint:disable max-classes-per-file
 import { Chunk, ChunkType, parseResourceValue, StringPool } from "./common";
 import Source from "./source";
 
