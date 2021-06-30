@@ -1,6 +1,6 @@
 {
   "name": "node-apk",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A library to parse Android application manifest and signature",
   "main": "dist/index.js",
   "scripts": {

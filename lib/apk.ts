@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 XdevL. All rights reserved.
+ * Copyright (c) 2021 XdevL. All rights reserved.
  *
  * This work is licensed under the terms of the MIT license.
  * For a copy, see <https://opensource.org/licenses/MIT>.
@@ -29,8 +29,8 @@ export default class Apk {
     return ZipEntry.index(this.loader).then((map) => {
       return Promise.all(Array.from(map.values())
         .filter((entry) => entry.name.startsWith("META-INF/") && entry.name.endsWith(".RSA"))
-        .map((certEntry) => this.bufferize(certEntry.stream()).then((buffer) => Certificate.parse(buffer))),
-      );
+        .map((certEntry) => this.bufferize(certEntry.stream()).then((buffer) => Certificate.fromPkcs7(buffer))),
+      ).then((certs) => ([] as Certificate[]).concat(...certs));
     });
   }
 
