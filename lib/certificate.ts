@@ -8,28 +8,26 @@ import NodeForge from "node-forge";
 
 type ForgeCertificate = NodeForge.pki.Certificate;
 
-const cn = (fields: {getField: (field: string) => any}) => fields.getField("CN").value;
-
 class CertificateStore {
-  private store = new Map<string, ForgeCertificate>();
+  private store = new Map<any, ForgeCertificate>();
 
 
   constructor(...certificates: ForgeCertificate[]) {
-    certificates.forEach((cert) => this.store.set(cn(cert.subject), cert));
+    certificates.forEach((cert) => this.store.set(cert.subject.hash, cert));
   }
 
-  getByCommonName(commonName: string): ForgeCertificate|undefined {
-    return this.store.get(commonName);
+  lookup(hash: any): ForgeCertificate|undefined {
+    return this.store.get(hash);
   }
 
   leaves(): ForgeCertificate[] {
     const leaves = new Set(this.store.keys());
-    this.store.forEach((cert) => !cert.isIssuer(cert) && leaves.delete(cn(cert.issuer)));
-    return Array.from(leaves).map((cn) => this.getByCommonName(cn)!);
+    this.store.forEach((cert) => !cert.isIssuer(cert) && leaves.delete(cert.issuer.hash));
+    return Array.from(leaves).map((hash) => this.lookup(hash)!);
   }
 
   chain<T>(certificate: ForgeCertificate, create: (cert: ForgeCertificate, parent?: T) => T): T {
-    const issuer = this.getByCommonName(cn(certificate.issuer));
+    const issuer = this.lookup(certificate.issuer.hash);
     if (issuer == null || certificate.isIssuer(certificate)) {
       return create(certificate)
     } else {
@@ -80,7 +78,7 @@ export default class Certificate {
   public readonly subject: Map<string, string>;
   public readonly bytes: Buffer;
 
-  constructor(input: ForgeCertificate, parent?: Certificate) {
+  private constructor(input: ForgeCertificate, parent?: Certificate) {
     const certificate = input;
     this.serial = certificate.serialNumber;
     this.validFrom = certificate.validity.notBefore;
