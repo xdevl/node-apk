@@ -29,7 +29,7 @@ export class ZipEntry {
 
   public static index(loader: BufferLoader): Promise<Map<string, ZipEntry>> {
     return loader().then((buffer) => {
-      const index = buffer.indexOf("504B0506", 0, "hex");
+      const index = buffer.lastIndexOf("504B0506", undefined, "hex");
       if (index < 0) {
         throw Error("End of central directory not found");
       }
@@ -71,7 +71,7 @@ export class ZipEntry {
     this.buffer = buffer;
     this.signature = source.readUInt();
     if (this.signature !== signature) {
-      throw Error(`Invalid file header signature found: 0x${signature.toString(16)}`);
+      throw Error(`Invalid file header signature found: 0x${this.signature.toString(16)}`);
     }
     this.versionMadeBy = this.signature === Signature.CENTRAL_HEADER ? source.readUShort() : 0;
     this.extractVersion = source.readUShort();
