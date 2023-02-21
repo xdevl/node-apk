@@ -23,16 +23,26 @@ class XmlAttribute {
 
 export default class XmlElement {
 
-  private static parseChildren(parent: XmlElement, source: Source, stringPool: StringPool) {
-    let chunk = new Chunk(source);
-    while (chunk.type !== ChunkType.XML_END_NAMESPACE && chunk.type !== ChunkType.XML_END_ELEMENT) {
-      if (chunk.type === ChunkType.XML_START_ELEMENT) {
-        const child = new XmlElement(chunk.chunkSource, stringPool);
-        parent.children[child.tag] = parent.children[child.tag] || [];
-        parent.children[child.tag].push(child);
-        XmlElement.parseChildren(child, source, stringPool);
+  private static parseChildren(parent: XmlElement, root: Chunk, stringPool: StringPool) {
+    const maxOffset = root.chunkSize - root.headerSize;
+    while (root.chunkSource.getCursorAndMove(0) < maxOffset) {
+      const chunk = new Chunk(root.chunkSource);
+      switch(chunk.type) {
+        case ChunkType.XML_START_ELEMENT: {
+          const child = new XmlElement(chunk.chunkSource, stringPool);
+          parent.children[child.tag] = parent.children[child.tag] || [];
+          parent.children[child.tag].push(child);
+          XmlElement.parseChildren(child, root, stringPool);
+          break;
+        }
+        case ChunkType.XML_START_NAMESPACE:
+          XmlElement.parseChildren(parent, root, stringPool);
+          break;
+
+        case ChunkType.XML_END_ELEMENT:
+        case ChunkType.XML_END_NAMESPACE:
+          return;
       }
-      chunk = new Chunk(source);
     }
   }
 
@@ -55,10 +65,14 @@ export default class XmlElement {
         this.attributes[attr.name] = attr.value;
       }
     } else {
-      source = new Chunk(source, ChunkType.XML).chunkSource;
-      stringPool = new StringPool(new Chunk(source, ChunkType.STRING_POOL));
+      const chunk = new Chunk(source, ChunkType.XML)
+      stringPool = new StringPool(new Chunk(chunk.chunkSource, ChunkType.STRING_POOL));
       this.tag = "xml";
-      XmlElement.parseChildren(this, source, stringPool);
+      XmlElement.parseChildren(this, chunk, stringPool);
     }
+  }
+
+  public toString(): string {
+    return JSON.stringify(this, null, 4);
   }
 }
